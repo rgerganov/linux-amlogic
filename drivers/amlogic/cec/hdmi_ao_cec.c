@@ -1134,6 +1134,8 @@ static void cec_pre_init(void)
 	}
 	ao_cec_init();
 
+	cec_config(cec_dev->tx_dev->cec_func_config, 1);
+
 	cec_arbit_bit_time_set(3, 0x118, 0);
 	cec_arbit_bit_time_set(5, 0x000, 0);
 	cec_arbit_bit_time_set(7, 0x2aa, 0);
@@ -2051,8 +2053,6 @@ static int hdmitx_cec_open(struct inode *inode, struct file *file)
 	cec_dev->cec_info.open_count++;
 	if (cec_dev->cec_info.open_count) {
 		cec_dev->cec_info.hal_ctl = 1;
-		/* set default logical addr flag for uboot */
-		cec_set_reg_bits(AO_DEBUG_REG1, 0xf, 16, 4);
 	}
 	return 0;
 }
