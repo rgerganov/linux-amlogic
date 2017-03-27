@@ -214,6 +214,7 @@ enum hdmi_audio_fs;
 /* CEA TIMING STRUCT DEFINITION */
 struct hdmi_cea_timing {
 	unsigned int pixel_freq; /* Unit: 1000 */
+	unsigned int frac_freq; /* 1.001 shift */
 	unsigned int h_freq; /* Unit: Hz */
 	unsigned int v_freq; /* Unit: 0.001 Hz */
 	unsigned int vsync_polarity:1;
@@ -251,6 +252,19 @@ enum hdmi_color_space {
 enum hdmi_color_range {
 	COLORRANGE_LIM,
 	COLORRANGE_FUL,
+};
+
+enum hdmi_3d_type {
+	T3D_FRAME_PACKING = 0,
+	T3D_FIELD_ALTER = 1,
+	T3D_LINE_ALTER = 2,
+	T3D_SBS_FULL = 3,
+	T3D_L_DEPTH = 4,
+	T3D_L_DEPTH_GRAPHICS = 5,
+	T3D_TAB = 6, /* Top and Buttom */
+	T3D_RSVD = 7,
+	T3D_SBS_HALF = 8,
+	T3D_DISABLE,
 };
 
 /* get hdmi cea timing */
@@ -332,7 +346,10 @@ unsigned int hdmi_get_csc_coef(
 	unsigned int input_format, unsigned int output_format,
 	unsigned int color_depth, unsigned int color_format,
 	unsigned char **coef_array, unsigned int *coef_length);
-struct hdmi_format_para *hdmi_get_fmt_name(char const *name);
+struct hdmi_format_para *hdmi_get_fmt_name(char const *name, char const *attr);
+const char *hdmi_get_str_cd(struct hdmi_format_para *para);
+const char *hdmi_get_str_cs(struct hdmi_format_para *para);
+const char *hdmi_get_str_cr(struct hdmi_format_para *para);
 unsigned int hdmi_get_aud_n_paras(enum hdmi_audio_fs fs,
 	enum hdmi_color_depth cd, unsigned int tmds_clk);
 
@@ -503,7 +520,7 @@ struct hdmi_rx_audioinfo {
 	unsigned CTS;
 };
 
-#define AUDIO_PARA_MAX_NUM       13
+#define AUDIO_PARA_MAX_NUM       14
 struct hdmi_audio_fs_ncts {
 	struct {
 		unsigned int tmds_clk;
