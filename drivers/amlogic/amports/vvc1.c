@@ -286,7 +286,7 @@ static irqreturn_t vvc1_isr(int irq, void *dev_id)
 
 
                 repeat_count = READ_VREG(VC1_REPEAT_COUNT);
-                buffer_index = ((reg & 0x7) - 1) & 3;
+                buffer_index = reg & 0x7;
                 picture_type = (reg >> 3) & 7;
 
 		if (pts_by_offset) {
@@ -304,10 +304,6 @@ static irqreturn_t vvc1_isr(int irq, void *dev_id)
 #endif
 			}
 		}
-
-		repeat_count = READ_VREG(VC1_REPEAT_COUNT);
-		buffer_index = reg & 0x7;
-		picture_type = (reg >> 3) & 7;
 
 		if (buffer_index >= DECODE_BUFFER_NUM_MAX) {
 			pr_info("fatal error, invalid buffer index.");
