@@ -676,17 +676,14 @@
 		};
 
 	};
-	remote:rc@c8100580 {
+	meson-remote {
 		compatible = "amlogic, aml_remote";
 		dev_name = "meson-remote";
-		reg = <0x0 0xc8100580 0x00 0x44>, /*Multi-format IR controller*/
-			<0x0 0xc8100480 0x00 0x20>; /*Legacy IR controller*/
 		status = "okay";
-		protocol = <REMOTE_TYPE_NEC>;
+		remote_ao_offset = <0x580>; /* 0x400 + (0x20 + idx)<<2 -- old ; 0x400 + (0x60 +idx)<<2 --new   */
 		interrupts = <0 196 1>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&remote_pins>;
-		max_frame_time = <200>; /*set software decoder max frame time*/
 	};
 
 	rng {
