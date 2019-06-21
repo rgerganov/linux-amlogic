@@ -500,7 +500,7 @@ static long remote_config_ioctl(struct file *filp, unsigned int cmd,
 	unsigned int ret;
 
 	if (args)
-		ret = copy_from_user(&val, argp, sizeof(unsigned int));
+		ret = copy_from_user(&val, argp, sizeof(unsigned long));
 	mutex_lock(&remote_file_mutex);
 	switch (cmd) {
 	case REMOTE_IOC_INFCODE_CONFIG:
@@ -536,35 +536,35 @@ static long remote_config_ioctl(struct file *filp, unsigned int cmd,
 		break;
 	case REMOTE_IOC_SET_RELT_DELAY:
 		ret = copy_from_user(&remote->relt_delay[remote->map_num],
-					argp, sizeof(int));
+					argp, sizeof(long));
 		break;
 	case REMOTE_IOC_SET_REPEAT_DELAY:
 		ret = copy_from_user(&remote->repeat_delay[remote->map_num],
 					argp,
-					sizeof(int));
+					sizeof(long));
 		break;
 	case REMOTE_IOC_SET_REPEAT_PERIOD:
 		ret = copy_from_user(&remote->repeat_peroid[remote->map_num],
 					argp,
-					sizeof(int));
+					sizeof(long));
 		break;
 	case REMOTE_IOC_SET_REPEAT_ENABLE:
 		ret = copy_from_user(&remote->repeat_enable, argp,
-					sizeof(int));
+					sizeof(long));
 		break;
 	case REMOTE_IOC_SET_DEBUG_ENABLE:
 		ret = copy_from_user(&remote->debug_enable, argp,
-							sizeof(int));
+							sizeof(long));
 		break;
 	case REMOTE_IOC_SET_MODE:
-		ret = copy_from_user(&remote->work_mode, argp, sizeof(int));
+		ret = copy_from_user(&remote->work_mode, argp, sizeof(long));
 		break;
 	case REMOTE_IOC_SET_BIT_COUNT:
-		ret = copy_from_user(&remote->bit_count, argp, sizeof(int));
+		ret = copy_from_user(&remote->bit_count, argp, sizeof(long));
 		break;
 	case REMOTE_IOC_SET_CUSTOMCODE:
 		ret = copy_from_user(&remote->custom_code[remote->map_num],
-							argp, sizeof(int));
+							argp, sizeof(long));
 		break;
 	case REMOTE_IOC_SET_REG_BASE_GEN:
 		am_remote_write_reg(OPERATION_CTRL_REG0, val);
@@ -587,7 +587,7 @@ static long remote_config_ioctl(struct file *filp, unsigned int cmd,
 	case REMOTE_IOC_SET_RELEASE_DELAY:
 		ret = copy_from_user(&remote->release_delay[remote->map_num],
 					argp,
-				sizeof(int));
+				sizeof(long));
 		break;
 	/*SW*/
 	case REMOTE_IOC_SET_TW_LEADER_ACT:
@@ -649,7 +649,7 @@ static long remote_config_ioctl(struct file *filp, unsigned int cmd,
 	case REMOTE_IOC_GET_TW_BIT0_TIME:
 	case REMOTE_IOC_GET_TW_BIT1_TIME:
 	case REMOTE_IOC_GET_TW_REPEATE_LEADER:
-		ret = copy_to_user(argp, &val, sizeof(int));
+		ret = copy_to_user(argp, &val, sizeof(long));
 		break;
 	case REMOTE_IOC_GET_POWERKEY:
 		ret = scpi_get_usr_data(SCPI_CL_POWER, &val, 1);
@@ -909,11 +909,6 @@ static int remote_resume(struct platform_device *pdev)
 	if (is_meson_m8m2_cpu()) {
 #define  AO_RTI_STATUS_REG2 ((0x00 << 10) | (0x02 << 2))
 		if (aml_read_aobus(AO_RTI_STATUS_REG2) == 0x1234abcd) {
-			input_event(gp_remote->input, EV_KEY, KEY_POWER, 1);
-			input_sync(gp_remote->input);
-			input_event(gp_remote->input, EV_KEY, KEY_POWER, 0);
-			input_sync(gp_remote->input);
-
 			/*aml_write_reg32(P_AO_RTC_ADDR0,
 			(aml_read_reg32(P_AO_RTC_ADDR0) | (0x0000f000)));*/
 			aml_write_aobus(AO_RTI_STATUS_REG2, 0);
@@ -921,17 +916,6 @@ static int remote_resume(struct platform_device *pdev)
 	} else {
 		if (get_resume_method() == REMOTE_WAKEUP) {
 			input_dbg("remote_wakeup\n");
-			input_event(gp_remote->input, EV_KEY, KEY_POWER, 1);
-			input_sync(gp_remote->input);
-			input_event(gp_remote->input, EV_KEY, KEY_POWER, 0);
-			input_sync(gp_remote->input);
-		}
-
-		if (get_resume_method() == REMOTE_CUS_WAKEUP) {
-			input_event(gp_remote->input, EV_KEY, 133, 1);
-			input_sync(gp_remote->input);
-			input_event(gp_remote->input, EV_KEY, 133, 0);
-			input_sync(gp_remote->input);
 		}
 		if (get_resume_method() == ETH_PHY_WAKEUP) {
 			input_dbg("ethernet_wakeup\n");
